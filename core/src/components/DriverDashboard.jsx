@@ -1,20 +1,53 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { connectWebSocket, sendMessage } from '../api/websocket';
 
 const DriverDashboard = () => {
   const [isPickedUpDisabled, setPickedUpDisabled] = useState(true);
   const [isDropOffDisabled, setDropOffDisabled] = useState(true);
+  const [status, setStatus] = useState("available");
+
+  const generateRandomLatLong = () => {
+    let latitude = 23.805300
+    let longitude = 90.364900
+    const randomLat = latitude + (Math.random() - 0.5) * 0.01;
+    const randomLng = longitude + (Math.random() - 0.5) * 0.01;
+    return { lat: randomLat, lng: randomLng };
+  };
+
+  useEffect(() => {
+    connectWebSocket(handleMessageReceived);
+  }, []);
+
+  const handleMessageReceived = (data) => {
+    console.log("Message from server:", data);
+  };
+
+  const updateStatus = (newStatus) => {
+    setStatus(newStatus);
+    const { lat, lng } = generateRandomLatLong();
+    const message = {
+      driver_id: 1,
+      status: newStatus,
+      latitude: lat,
+      longitude: lng,
+    };
+
+    sendMessage(message);
+  };
 
   const handlePickUpRequest = () => {
-    setPickedUpDisabled(false); // Enable "Picked Up" button
+    updateStatus("on_ride");
+    setPickedUpDisabled(false);
   };
 
   const handlePickedUp = () => {
-    setDropOffDisabled(false); // Enable "Drop Off" button
-    setPickedUpDisabled(true); // Disable "Picked Up" button after it's clicked
+    updateStatus("way_to_dropoff");
+    setDropOffDisabled(false);
+    setPickedUpDisabled(true);
   };
 
   const handleDropOff = () => {
-    // Reset buttons to initial disabled state after drop off
+    updateStatus("available");
     setPickedUpDisabled(true);
     setDropOffDisabled(true);
   };
@@ -26,7 +59,7 @@ const DriverDashboard = () => {
 
         <div className="flex items-center justify-between bg-gradient-to-r from-green-50 to-green-100 border-l-4 border-green-500 text-green-700 p-5 rounded-lg shadow mb-8">
           <div>
-            <p className="text-lg font-semibold">Status: <span className="text-green-600">Available</span></p>
+            <p className="text-lg font-semibold">Status: <span className="text-green-600 capitalize">{status.replace('_', ' ')}</span></p>
             <p className="text-sm mt-1">You're ready to accept requests.</p>
           </div>
           <svg className="h-10 w-10 text-green-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
