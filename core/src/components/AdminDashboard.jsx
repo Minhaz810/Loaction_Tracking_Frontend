@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import Map from './Map';
 import AdminEarningGraph from './chart';
 import Navbar from './Navbar';
+import TipData from './TipData';
 
 const AdminDashboard = () => {
   const [selectedStatus, setSelectedStatus] = useState("available");
+  const [coordinates, setCoordinates] = useState([]); 
 
   const [statuses, setStatuses] = useState([
     { label: "Available", value: "available", count: 0, coordinates: [] },
@@ -24,26 +26,32 @@ const AdminDashboard = () => {
       count: driverStatusData[status.value]?.count || 0,
       coordinates: driverStatusData[status.value]?.coordinates || []
     }));
-
     setStatuses(updatedStatuses);
   };
 
+
+
   useEffect(() => {
     const socket = new WebSocket('ws://localhost:8000/ws/driver-status/');
-
     socket.onmessage = handleWebSocketMessage;
-
     return () => {
       socket.close();
     };
   }, []);
 
+  useEffect(() => {
+    const selected = statuses.find(s => s.value === "available");
+    console.log(selected)
+    setCoordinates(selected?.coordinates || []);
+  }, []);
+
+  console.log(coordinates)
+
   const handleStatusChange = (status) => {
     setSelectedStatus(status);
+    const selected = statuses.find(s => s.value === status);
+    setCoordinates(selected?.coordinates || []);
   };
-
-  console.log(statuses)
-
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center">
       <Navbar/>
@@ -70,7 +78,7 @@ const AdminDashboard = () => {
           </div>
 
           <div className="h-[50vh] bg-white rounded-lg shadow-md overflow-hidden">
-            <Map />
+            <Map coordinates={coordinates} />
           </div>
           <div className='font-bold text-2xl'>
             Admin Earnings
@@ -84,7 +92,7 @@ const AdminDashboard = () => {
           <div className=" flex gap-3">
             <div className='flex flex-col gap-2 items-center justify-center bg-white rounded-lg shadow-md w-full px-12 py-4'>
               <div className='font-bold text-lg'>User</div>
-              <div>Number</div>
+              <div>0</div>
             </div>
             <div className='flex flex-col gap-2 items-center justify-center bg-white rounded-lg w-full shadow-md px-12 py-4'>
               <div className='font-bold text-lg'>Active Drivers</div>
@@ -99,6 +107,10 @@ const AdminDashboard = () => {
             <div className='font-bold text-2xl'>
               Tip statistics
             </div>
+            <div className='h-[400px] w-full'>
+            <TipData/> 
+            </div>
+            
           </div>
         </div>
       </div>
