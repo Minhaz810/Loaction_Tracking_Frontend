@@ -2,7 +2,7 @@ import React from 'react';
 
 const Navbar = () => {
   return (
-    <nav className="w-full bg-blue-600 text-white shadow-md p-4">
+    <nav className="w-full bg-blue-600 text-white shadow-md p-4 fixed top-0 z-50">
       <div className="container mx-auto flex justify-between items-center">
         <h1 className="text-2xl font-bold">Admin Dashboard</h1>
         <ul className="flex space-x-6">
