@@ -1,18 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import DriverDashboard from './components/DriverDashboard'; 
-import AdminDashboard from './components/AdminDashboard';
+import { RouterProvider } from 'react-router-dom';
+import router from './routes';
 
 
 const App = () => {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<AdminDashboard/>} />
-        <Route path="/driver" element={<DriverDashboard />} />
-      </Routes>
-    </Router>
-  );
+  return <RouterProvider router={router} />;
 };
 
 export default App;

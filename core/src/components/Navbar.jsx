@@ -1,6 +1,12 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
+  const navigate = useNavigate()
+  const handleLogout = () =>{
+    navigate("/login")
+    localStorage.clear()
+  }
   return (
     <nav className="w-full bg-blue-600 text-white shadow-md p-4 fixed top-0 z-50">
       <div className="container mx-auto flex justify-between items-center">
@@ -16,7 +22,9 @@ const Navbar = () => {
             <a href="#settings" className="hover:text-gray-300">Settings</a>
           </li>
           <li>
-            <a href="#logout" className="hover:text-gray-300">Logout</a>
+            <div className="hover:text-gray-300"
+            onClick={handleLogout}
+            >Logout</div>
           </li>
         </ul>
       </div>

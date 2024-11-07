@@ -21,30 +21,43 @@ const AdminEarningGraph = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const response = await fetch('http://127.0.0.1:8000/api/admin-earnings/');
-        const data = await response.json();
-        const records = data.records;
-        const labels = records.map(record => new Date(record.datetime).toLocaleTimeString());
-        const earnings = records.map(record => parseFloat(record.earning));
-
-        setChartData({
-          labels,
-          datasets: [
-            {
-              label: "Earning",
-              data: earnings,
-              fill: false,
-              borderColor: "rgb(75, 192, 192)",
-              backgroundColor: "rgba(75, 192, 192, 0.2)",
-              tension: 0.2,
-            },
-          ],
-        });
-      } catch (error) {
-        console.error('Error fetching admin earnings data:', error);
-      }
+      const userToken = localStorage.getItem('userToken');
+      const headers = userToken
+        ? {
+            'Authorization': `Bearer ${userToken}`,
+            'Content-Type': 'application/json',
+          }
+        : {
+            'Content-Type': 'application/json',
+          };
+    
+      const response = await fetch('http://127.0.0.1:8000/api/admin-earnings/', {
+        method: 'GET',
+        headers: headers,
+      });
+    
+      const data = await response.json();
+      const records = data.records;
+      const labels = records.map(record => new Date(record.datetime).toLocaleTimeString());
+      const earnings = records.map(record => parseFloat(record.earning));
+    
+      setChartData({
+        labels,
+        datasets: [
+          {
+            label: "Earning",
+            data: earnings,
+            fill: false,
+            borderColor: "rgb(75, 192, 192)",
+            backgroundColor: "rgba(75, 192, 192, 0.2)",
+            tension: 0.2,
+          },
+        ],
+      });
+    
+      setLoading(false);
     };
+    
 
     fetchData();
   }, []);

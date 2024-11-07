@@ -10,30 +10,41 @@ const TipData = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const response = await fetch('http://127.0.0.1:8000/api/tips/');
-        const data = await response.json();
-        
-        const statusCounts = data;
-        const labels = Object.keys(statusCounts);
-        const counts = Object.values(statusCounts);
-
-        setData({
-          labels: labels,
-          datasets: [
-            {
-              data: counts,
-              backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-              hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
-            }
-          ]
-        });
-      } catch (error) {
-        console.error("There was an error fetching the data!", error);
-      } finally {
-        setLoading(false);
-      }
+      const userToken = localStorage.getItem('userToken');
+      const headers = userToken
+        ? {
+            'Authorization': `Bearer ${userToken}`,
+            'Content-Type': 'application/json',
+          }
+        : {
+            'Content-Type': 'application/json',
+          };
+    
+      const response = await fetch('http://127.0.0.1:8000/api/tips/', {
+        method: 'GET',
+        headers: headers,
+      });
+    
+      const data = await response.json();
+      
+      const statusCounts = data;
+      const labels = Object.keys(statusCounts);
+      const counts = Object.values(statusCounts);
+    
+      setData({
+        labels: labels,
+        datasets: [
+          {
+            data: counts,
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+            hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+          }
+        ]
+      });
+    
+      setLoading(false);
     };
+    
 
     fetchData();
   }, []);
